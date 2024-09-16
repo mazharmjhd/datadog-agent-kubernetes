@@ -1,0 +1,13 @@
+datadog:
+  apiKey: "cd7d543b2a3423114accc56e72143a3b"
+  appKey: "a4f071aea64fd6bbc42516431e9f2fc9f3af1b63"
+  site: "us5.datadoghq.com"
+  logs:
+    enabled: true
+    containerCollectAll: true
+  volumeMounts:
+    - name: logdatadog
+      mountPath: /var/log/datadog
+  volumes:
+    - name: logdatadog
+      emptyDir: {}
