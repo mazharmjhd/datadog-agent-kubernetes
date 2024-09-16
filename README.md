@@ -14,3 +14,5 @@ helm install datadog-agent datadog/datadog \
   --set datadog.volumeMounts[0].mountPath=/var/log/datadog \
   --set datadog.volumes[0].name=logdatadog \
   --set datadog.volumes[0].emptyDir={}
+  
+helm upgrade --install datadog-agent datadog/datadog -f values.yaml
