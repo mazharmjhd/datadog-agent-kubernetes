@@ -103,6 +103,3 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: manual  # Menambahkan StorageClass yang sama seperti di PV
-
-
-list deploy :
