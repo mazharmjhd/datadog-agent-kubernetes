@@ -2,8 +2,8 @@ helm repo add datadog https://helm.datadoghq.com
 helm repo update
 
 helm install datadog-agent datadog/datadog \
-  --set datadog.apiKey=0e5038dad203a6b02f4e0c27ac0cfc59 \
-  --set datadog.appKey=a9372421886d19d4700c55aaabf67620acb36dc3 \
+  --set datadog.apiKey=  \
+  --set datadog.appKey=  \
   --set datadog.logs.enabled=true \
   --set datadog.logs.containerCollectAll=true \
   --set datadog.volumeMounts[0].name=logdatadog \
