@@ -1,0 +1,108 @@
+helm repo add datadog https://helm.datadoghq.com
+helm repo update
+
+helm install datadog-agent datadog/datadog \
+  --set datadog.apiKey=0e5038dad203a6b02f4e0c27ac0cfc59 \
+  --set datadog.appKey=a9372421886d19d4700c55aaabf67620acb36dc3 \
+  --set datadog.logs.enabled=true \
+  --set datadog.logs.containerCollectAll=true \
+  --set datadog.volumeMounts[0].name=logdatadog \
+  --set datadog.volumeMounts[0].mountPath=/var/log/datadog \
+  --set datadog.volumes[0].name=logdatadog \
+  --set datadog.volumes[0].emptyDir={}
+
+helm install datadog-agent datadog/datadog -f datadog-agent.yaml
+helm upgrade --install datadog-agent datadog/datadog -f values.yaml
+
+---------------------------------- install postgres on kubernetes ---------------------------------
+
+postgres-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard-rwo
+  hostPath:
+    path: /mnt/data
+  persistentVolumeReclaimPolicy: Retain
+  
+postgres-deployment.yaml  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
+
+postgresql.conf  
+
+postgresql-configmap.yaml  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+data:
+  postgresql.conf: |
+    shared_preload_libraries = 'pg_stat_statements'
+
+service.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+  storageClassName: manual  # Menambahkan StorageClass untuk memastikan PVC mengikat dengan PV ini
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: manual  # Menambahkan StorageClass yang sama seperti di PV
+
+
+list deploy :
